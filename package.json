@@ -1,0 +1,51 @@
+{
+	"name": "create-kavel",
+	"version": "0.1.0",
+	"description": "Scaffold a full-stack Cloudflare app — Bun, TanStack Start, Hono, D1. Pick your modules: auth, payments, email, i18n, UI.",
+	"keywords": [
+		"create",
+		"cli",
+		"scaffold",
+		"cloudflare",
+		"starter",
+		"tanstack",
+		"hono",
+		"d1",
+		"bun"
+	],
+	"homepage": "https://createkavel.com",
+	"repository": {
+		"type": "git",
+		"url": "git+https://github.com/kavelkit/create-kavel.git"
+	},
+	"author": "Niels van de Pol",
+	"license": "MIT",
+	"type": "module",
+	"bin": {
+		"create-kavel": "./dist/index.js"
+	},
+	"files": [
+		"dist"
+	],
+	"engines": {
+		"node": ">=18"
+	},
+	"scripts": {
+		"build": "tsup",
+		"dev": "tsup --watch",
+		"check": "biome check --write .",
+		"check-types": "tsc --noEmit",
+		"prepublishOnly": "bun run build"
+	},
+	"dependencies": {
+		"@clack/prompts": "^0.11.0",
+		"execa": "^9.6.0",
+		"picocolors": "^1.1.1"
+	},
+	"devDependencies": {
+		"@biomejs/biome": "2.4.8",
+		"@types/node": "^25.5.0",
+		"tsup": "^8.5.0",
+		"typescript": "^5.9.3"
+	}
+}
