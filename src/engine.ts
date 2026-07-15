@@ -4,13 +4,14 @@ import {
 	mkdirSync,
 	readdirSync,
 	readFileSync,
+	rmSync,
 	statSync,
 	writeFileSync,
 } from "node:fs";
 import { basename, dirname, join, relative } from "node:path";
 import type { KitJson } from "./kit.js";
 
-/** Local dev artifacts that may sit in the template working tree — never scaffolded. */
+/** Local dev artifacts that may sit in the template working tree, never scaffolded. */
 const COPY_EXCLUDE = new Set([
 	".DS_Store",
 	".git",
@@ -63,6 +64,8 @@ export interface AssembleOptions {
 	projectName: string;
 	/** Modules in dependency-first order (see resolveModules). */
 	modules: string[];
+	/** Locales to keep when the i18n module is included (first = base). Defaults to en, nl. */
+	locales?: string[];
 	kit: KitJson;
 	/** Commit SHA of the template the scaffold was built from (for kit.lock). */
 	templateCommit?: string;
@@ -175,6 +178,48 @@ function applyPatch(
 	writeFileSync(targetPath, content);
 }
 
+/**
+ * Restrict an assembled i18n project to a chosen set of locales: keep only the
+ * selected message catalogs, set the base (fallback) locale to the first entry,
+ * and sync project.inlang/settings.json and lib/i18n.ts. No-op without catalogs.
+ */
+function applyLocales(root: string, locales: string[]) {
+	const messagesDir = join(root, "messages");
+	if (!existsSync(messagesDir)) return;
+
+	const available = readdirSync(messagesDir)
+		.filter((f) => f.endsWith(".json"))
+		.map((f) => f.replace(/\.json$/, ""));
+	for (const loc of locales) {
+		if (!available.includes(loc)) {
+			throw new Error(`Locale "${loc}" has no catalog. Available: ${available.join(", ")}`);
+		}
+	}
+
+	for (const f of readdirSync(messagesDir)) {
+		const loc = f.replace(/\.json$/, "");
+		if (f.endsWith(".json") && !locales.includes(loc)) rmSync(join(messagesDir, f));
+	}
+
+	const settingsPath = join(root, "project.inlang", "settings.json");
+	if (existsSync(settingsPath)) {
+		const settings = JSON.parse(readFileSync(settingsPath, "utf8"));
+		settings.baseLocale = locales[0];
+		settings.locales = locales;
+		writeFileSync(settingsPath, `${JSON.stringify(settings, null, "\t")}\n`);
+	}
+
+	const i18nPath = join(root, "apps/web/src/lib/i18n.ts");
+	if (existsSync(i18nPath)) {
+		const arr = `[${locales.map((l) => `"${l}"`).join(", ")}] as const`;
+		const content = readFileSync(i18nPath, "utf8").replace(
+			/const locales = \[[^\]]*\] as const/,
+			`const locales = ${arr}`,
+		);
+		writeFileSync(i18nPath, content);
+	}
+}
+
 function applyOverlay(outDir: string, overlayRoot: string, moduleName: string) {
 	const filesDir = join(overlayRoot, "files");
 	if (existsSync(filesDir)) {
@@ -203,6 +248,7 @@ function applyOverlay(outDir: string, overlayRoot: string, moduleName: string) {
  */
 export function assemble(opts: AssembleOptions): AssembleResult {
 	const { templateDir, outDir, projectName, modules, kit, templateCommit } = opts;
+	const locales = opts.locales?.length ? opts.locales : ["en", "nl"];
 
 	if (existsSync(outDir) && readdirSync(outDir).length > 0) {
 		throw new Error(`Output directory ${outDir} exists and is not empty.`);
@@ -280,6 +326,9 @@ export function assemble(opts: AssembleOptions): AssembleResult {
 		}
 	}
 
+	// 3b. locale selection (i18n only), prune catalogs + sync config
+	if (modules.includes("i18n")) applyLocales(outDir, locales);
+
 	// 4. PROJECT_NAME replacement (file contents only)
 	for (const file of walkFiles(outDir)) {
 		if (!isTextFile(file)) continue;
@@ -288,7 +337,7 @@ export function assemble(opts: AssembleOptions): AssembleResult {
 			writeFileSync(file, content.replaceAll("PROJECT_NAME", projectName));
 	}
 
-	// 5. kit.lock — records what was assembled, for a future `add` command.
+	// 5. kit.lock, records what was assembled, for a future `add` command.
 	writeFileSync(
 		join(outDir, "kit.lock"),
 		`${JSON.stringify({ kit: kit.name, kitVersion: kit.version, templateCommit: templateCommit ?? null, projectName, modules }, null, "\t")}\n`,

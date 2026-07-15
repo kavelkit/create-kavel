@@ -1,7 +1,7 @@
 {
 	"name": "create-kavel",
 	"version": "0.1.0",
-	"description": "Scaffold a full-stack Cloudflare app — Bun, TanStack Start, Hono, D1. Pick your modules: auth, payments, email, i18n, UI.",
+	"description": "Scaffold a full-stack Cloudflare app, Bun, TanStack Start, Hono, D1. Pick your modules: auth, payments, email, i18n, UI.",
 	"keywords": [
 		"create",
 		"cli",

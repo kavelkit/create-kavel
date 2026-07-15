@@ -1,6 +1,6 @@
 # create-kavel
 
-The scaffolding CLI for [Kavel](https://createkavel.com) — a full-stack Cloudflare
+The scaffolding CLI for [Kavel](https://createkavel.com), a full-stack Cloudflare
 starter kit (Bun · TanStack Start · Hono · D1 · Drizzle · ORPC).
 
 ```bash
@@ -9,7 +9,7 @@ bun create kavel
 npm create kavel@latest
 ```
 
-Pick your modules at scaffold time — **auth** (better-auth: email/password,
+Pick your modules at scaffold time, **auth** (better-auth: email/password,
 verification, OAuth, admin), **email** (React Email + Resend + a D1 queue),
 **i18n** (Paraglide), and **ui** (a shadcn-style component library). Dependencies
 between modules are resolved automatically.
@@ -41,14 +41,14 @@ bun create kavel my-app --yes --modules auth,i18n,ui
 
 Kavel's templates live in a **private repo**; buying the kit grants your GitHub
 account access. The CLI verifies access with `git ls-remote` and then clones the
-template using your own git credentials — there are no license keys. If you don't
+template using your own git credentials, there are no license keys. If you don't
 have access yet, buy the kit at [createkavel.com](https://createkavel.com).
 
 Environment overrides: `KAVEL_REPO` (template repo URL) and `KAVEL_TEMPLATE_DIR`
-(use a local checkout, skipping the clone — handy for development).
+(use a local checkout, skipping the clone, handy for development).
 
 ## Requirements
 
-- [Bun](https://bun.sh) — the scaffolded app is a Bun monorepo (the CLI itself
+- [Bun](https://bun.sh), the scaffolded app is a Bun monorepo (the CLI itself
   runs under Node or Bun).
 - A GitHub account with access to the Kavel template repo.

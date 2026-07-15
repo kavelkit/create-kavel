@@ -12,7 +12,7 @@ export const PURCHASE_URL = "https://createkavel.com";
 export const LOCAL_TEMPLATE = process.env.KAVEL_TEMPLATE_DIR;
 
 // Never let git block on an interactive credential, host-key, or passphrase
-// prompt — fail fast instead of hanging until the timeout.
+// prompt, fail fast instead of hanging until the timeout.
 const GIT_ENV = {
 	GIT_TERMINAL_PROMPT: "0",
 	GIT_SSH_COMMAND: "ssh -oBatchMode=yes",
@@ -46,7 +46,7 @@ export async function checkAccess(repo = TEMPLATE_REPO): Promise<void> {
 				`If you haven't bought Kavel yet, get access at ${PURCHASE_URL}\n\n` +
 				"If you have access, this is usually one of:\n" +
 				"  • not signed in to GitHub for this repo (check your SSH key or `gh auth`)\n" +
-				"  • using HTTPS creds with the default SSH URL — set KAVEL_REPO to the https:// URL\n" +
+				"  • using HTTPS creds with the default SSH URL, set KAVEL_REPO to the https:// URL\n" +
 				"  • no network connection",
 		);
 	}

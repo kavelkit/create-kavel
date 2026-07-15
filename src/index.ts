@@ -6,7 +6,16 @@ import { execa } from "execa";
 import pc from "picocolors";
 import { HELP_TEXT, parseCliArgs } from "./args.js";
 import { assemble } from "./engine.js";
-import { availableModules, defaultModules, type KitJson, readKit, resolveModules } from "./kit.js";
+import {
+	availableLocales,
+	availableModules,
+	DEFAULT_LOCALES,
+	defaultModules,
+	type KitJson,
+	LOCALE_LABELS,
+	readKit,
+	resolveModules,
+} from "./kit.js";
 import {
 	AccessError,
 	checkAccess,
@@ -29,7 +38,7 @@ function runCleanup() {
 	cleanup = undefined;
 }
 
-// process.exit (via cancel) and signals skip finally blocks — clean up here.
+// process.exit (via cancel) and signals skip finally blocks, clean up here.
 for (const sig of ["SIGINT", "SIGTERM"] as const) {
 	process.on(sig, () => {
 		runCleanup();
@@ -110,7 +119,7 @@ async function main() {
 		projectName = args.name;
 	} else if (args.yes) {
 		projectName = "my-kavel-app";
-		p.log.info(`No name given — using ${pc.cyan(projectName)}.`);
+		p.log.info(`No name given, using ${pc.cyan(projectName)}.`);
 	} else {
 		const answer = await p.text({
 			message: "Project name?",
@@ -196,6 +205,44 @@ async function main() {
 			p.log.info(`Added required dependencies: ${pc.cyan(autoAdded.join(", "))}`);
 		p.log.step(`Modules: ${ordered.length ? pc.cyan(ordered.join(", ")) : pc.dim("(base only)")}`);
 
+		// --- language selection (i18n only) ---
+		let locales: string[] | undefined;
+		if (ordered.includes("i18n")) {
+			const available = availableLocales(templateDir);
+			if (available.length) {
+				if (args.locales !== undefined) {
+					const unknown = args.locales.filter((l) => !available.includes(l));
+					if (unknown.length)
+						cancel(
+							`Unknown language(s): ${unknown.join(", ")}. Available: ${available.join(", ")}`,
+						);
+					locales = args.locales; // caller's order, first is the base locale
+				} else if (args.yes) {
+					locales = DEFAULT_LOCALES.filter((l) => available.includes(l));
+				} else {
+					const selection = await p.multiselect({
+						message: "Which languages? (space to toggle, enter to confirm)",
+						options: available.map((code) => ({
+							value: code,
+							label: LOCALE_LABELS[code] ?? code,
+							hint: code,
+						})),
+						initialValues: DEFAULT_LOCALES.filter((l) => available.includes(l)),
+						required: true,
+					});
+					if (p.isCancel(selection)) cancel("Cancelled.");
+					// Normalize to available order (English first) so the base is deterministic.
+					locales = available.filter((l) => (selection as string[]).includes(l));
+				}
+				if (locales?.length)
+					p.log.step(
+						`Languages: ${pc.cyan(locales.map((l) => LOCALE_LABELS[l] ?? l).join(", "))} ${pc.dim(`(base: ${locales[0]})`)}`,
+					);
+			}
+		} else if (args.locales !== undefined) {
+			p.log.warn("--locales ignored (i18n module not selected).");
+		}
+
 		// --- assemble ---
 		const commit = await templateCommit(templateDir);
 		const s = p.spinner();
@@ -207,6 +254,7 @@ async function main() {
 				outDir,
 				projectName,
 				modules: ordered,
+				locales,
 				kit,
 				templateCommit: commit,
 			}));
@@ -243,11 +291,11 @@ async function main() {
 					installed = true;
 					s2.stop("Dependencies installed");
 				} catch {
-					s2.stop("bun install failed — run it yourself later");
+					s2.stop("bun install failed, run it yourself later");
 				}
 			} else {
 				p.log.warn(
-					"bun not found — skipping install. Install bun (https://bun.sh) then run `bun install`.",
+					"bun not found, skipping install. Install bun (https://bun.sh) then run `bun install`.",
 				);
 			}
 		}
@@ -293,7 +341,7 @@ async function main() {
 				});
 				p.log.step("Initialized git repository");
 			} catch {
-				p.log.warn("git init failed — skipped.");
+				p.log.warn("git init failed, skipped.");
 			}
 		}
 

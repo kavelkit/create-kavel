@@ -1,11 +1,11 @@
-import { readFileSync } from "node:fs";
+import { existsSync, readdirSync, readFileSync } from "node:fs";
 import { join } from "node:path";
 
 export interface KitModule {
 	description: string;
 	requires: string[];
 	default?: boolean;
-	/** "planned" modules exist in kit.json but aren't built yet — never offered. */
+	/** "planned" modules exist in kit.json but aren't built yet, never offered. */
 	status?: string;
 }
 
@@ -18,6 +18,32 @@ export interface KitJson {
 
 export function readKit(templateDir: string): KitJson {
 	return JSON.parse(readFileSync(join(templateDir, "kit.json"), "utf8"));
+}
+
+/** Human-readable names for the curated locales the kit ships. */
+export const LOCALE_LABELS: Record<string, string> = {
+	en: "English",
+	nl: "Nederlands",
+	de: "Deutsch",
+	fr: "Français",
+	es: "Español",
+};
+
+/** Locales pre-selected by default (kept minimal, buyers add the rest). */
+export const DEFAULT_LOCALES = ["en", "nl"];
+
+/**
+ * Locales the kit ships translated catalogs for, discovered from the i18n
+ * module's message files. English is listed first (the conventional base);
+ * the rest are alphabetical. Empty if the template has no i18n catalogs.
+ */
+export function availableLocales(templateDir: string): string[] {
+	const dir = join(templateDir, "modules", "i18n", "files", "messages");
+	if (!existsSync(dir)) return [];
+	return readdirSync(dir)
+		.filter((f) => f.endsWith(".json"))
+		.map((f) => f.replace(/\.json$/, ""))
+		.sort((a, b) => (a === "en" ? -1 : b === "en" ? 1 : a.localeCompare(b)));
 }
 
 /** Modules that are actually built and can be selected. */

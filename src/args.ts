@@ -7,6 +7,8 @@ export interface CliArgs {
 	yes: boolean;
 	/** Explicit module list ("auth,email"); undefined = not passed. */
 	modules?: string[];
+	/** Explicit locale list ("en,de"; first = base) for i18n; undefined = not passed. */
+	locales?: string[];
 	install?: boolean;
 	git?: boolean;
 	/** Local template dir override (skips clone). */
@@ -25,6 +27,7 @@ export function parseCliArgs(argv: string[]): CliArgs {
 			options: {
 				yes: { type: "boolean", short: "y", default: false },
 				modules: { type: "string" },
+				locales: { type: "string" },
 				// --install force-runs install without the confirm prompt; --no-install skips it.
 				install: { type: "boolean" },
 				"no-install": { type: "boolean" },
@@ -46,8 +49,17 @@ export function parseCliArgs(argv: string[]): CliArgs {
 							.split(",")
 							.map((m) => m.trim())
 							.filter(Boolean),
+			locales:
+				values.locales === undefined
+					? undefined
+					: values.locales
+							.split(",")
+							.map((l) => l.trim())
+							.filter(Boolean),
 			install: values["no-install"] ? false : values.install ? true : undefined,
 			git: values["no-git"] ? false : undefined,
+			template: values.template,
+			repo: values.repo,
 			help: values.help,
 			version: values.version,
 		};
@@ -58,7 +70,7 @@ export function parseCliArgs(argv: string[]): CliArgs {
 }
 
 export const HELP_TEXT = `
-create-kavel — scaffold a full-stack Cloudflare app
+create-kavel, scaffold a full-stack Cloudflare app
 
 Usage:
   bun create kavel [name] [options]
@@ -67,6 +79,7 @@ Usage:
 Options:
   -y, --yes             Skip prompts; use defaults (or --modules)
       --modules a,b,c   Modules to include (auth, email, i18n, ui)
+      --locales en,de   Languages for i18n (first is the base/fallback)
       --no-install      Don't run the install step
       --no-git          Don't initialize a git repository
       --template <dir>  Use a local template checkout instead of cloning
