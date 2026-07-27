@@ -1,7 +1,9 @@
 # create-kavel
 
 The scaffolding CLI for [Kavel](https://createkavel.com), a full-stack Cloudflare
-starter kit (Bun · TanStack Start · Hono · D1 · Drizzle · ORPC).
+starter kit (Bun · TanStack Start · Hono · D1 · Drizzle · oRPC). One command
+scaffolds a typed monorepo, wired together and ready to deploy to Cloudflare,
+that you own outright: no subscription, no lock-in.
 
 ```bash
 bun create kavel
