@@ -27,6 +27,11 @@ import {
 
 const NAME_RE = /^[a-z][a-z0-9-]*$/;
 
+/** Square cadastral spinner: a filled block travelling the four corners,
+ * echoing the 2x2 brand mark, in place of clack's default dots. */
+const SPINNER_FRAMES = ["▘", "▝", "▗", "▖"];
+const brandSpinner = () => p.spinner({ frames: SPINNER_FRAMES, delay: 120 });
+
 /** Cleanup for the temp clone; module-scoped so cancel()/signals can run it too. */
 let cleanup: (() => void) | undefined;
 function runCleanup() {
@@ -144,7 +149,7 @@ async function main() {
 			cancel(`No kit.json found in template dir ${pc.cyan(templateDir)}.`);
 		}
 	} else {
-		const s = p.spinner();
+		const s = brandSpinner();
 		s.start("Checking kit access");
 		try {
 			await checkAccess(repo);
@@ -155,7 +160,7 @@ async function main() {
 		}
 		s.stop("Access confirmed");
 
-		const s2 = p.spinner();
+		const s2 = brandSpinner();
 		s2.start("Fetching template");
 		try {
 			const cloned = await cloneTemplate(repo);
@@ -245,7 +250,7 @@ async function main() {
 
 		// --- assemble ---
 		const commit = await templateCommit(templateDir);
-		const s = p.spinner();
+		const s = brandSpinner();
 		s.start(`Assembling ${pc.cyan(projectName)}`);
 		let nextSteps: string[];
 		try {
@@ -284,7 +289,7 @@ async function main() {
 		let installed = false;
 		if (doInstall) {
 			if (await hasBun()) {
-				const s2 = p.spinner();
+				const s2 = brandSpinner();
 				s2.start("Installing dependencies (bun install)");
 				try {
 					await execa("bun", ["install"], { cwd: outDir });
@@ -304,7 +309,7 @@ async function main() {
 			// Seed .dev.vars and generate Cloudflare types so the scaffold typechecks
 			// and runs before the user has filled in any secrets.
 			seedDevVars(outDir);
-			const s3 = p.spinner();
+			const s3 = brandSpinner();
 			s3.start("Generating types");
 			try {
 				await execa("bun", ["run", "cf-typegen"], { cwd: outDir });
@@ -315,7 +320,7 @@ async function main() {
 
 			// Marker injections leave imports out of order and a stray `export {};`;
 			// biome --write repairs them so the scaffold is clean on first `bun check`.
-			const s4 = p.spinner();
+			const s4 = brandSpinner();
 			s4.start("Formatting");
 			try {
 				await execa("bun", ["run", "check"], { cwd: outDir });
