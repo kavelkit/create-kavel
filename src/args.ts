@@ -78,7 +78,7 @@ Usage:
 
 Options:
   -y, --yes             Skip prompts; use defaults (or --modules)
-      --modules a,b,c   Modules to include (auth, email, i18n, ui)
+      --modules a,b,c   Modules to include (auth, payments, email, i18n, ui, marketing-pages)
       --locales en,de   Languages for i18n (first is the base/fallback)
       --no-install      Don't run the install step
       --no-git          Don't initialize a git repository

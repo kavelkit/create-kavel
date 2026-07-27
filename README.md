@@ -10,9 +10,11 @@ npm create kavel@latest
 ```
 
 Pick your modules at scaffold time, **auth** (better-auth: email/password,
-verification, OAuth, admin), **email** (React Email + Resend + a D1 queue),
-**i18n** (Paraglide), and **ui** (a shadcn-style component library). Dependencies
-between modules are resolved automatically.
+verification, OAuth, admin), **payments** (Stripe: checkout, customer portal,
+signature-verified webhooks), **email** (React Email + Resend + a D1 queue),
+**i18n** (Paraglide), **ui** (a shadcn-style component library), and
+**marketing-pages** (pre-styled landing + pricing). Dependencies between modules
+are resolved automatically.
 
 ## Usage
 
@@ -23,7 +25,7 @@ bun create kavel [name] [options]
 | Option | Description |
 |---|---|
 | `-y, --yes` | Skip prompts; use defaults (or `--modules`) |
-| `--modules a,b,c` | Modules to include (`auth`, `email`, `i18n`, `ui`) |
+| `--modules a,b,c` | Modules to include (`auth`, `payments`, `email`, `i18n`, `ui`, `marketing-pages`) |
 | `--no-install` | Don't run the install step |
 | `--no-git` | Don't initialize a git repository |
 | `--template <dir>` | Use a local template checkout instead of cloning |
