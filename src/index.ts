@@ -27,9 +27,9 @@ import {
 
 const NAME_RE = /^[a-z][a-z0-9-]*$/;
 
-/** Square cadastral spinner: a filled block travelling the four corners,
- * echoing the 2x2 brand mark, in place of clack's default dots. */
-const SPINNER_FRAMES = ["▘", "▝", "▗", "▖"];
+/** Square cadastral spinner: a chunky block whose cut corner rotates
+ * clockwise, echoing the brand mark, in place of clack's default dots. */
+const SPINNER_FRAMES = ["▛", "▜", "▟", "▙"];
 const brandSpinner = () => p.spinner({ frames: SPINNER_FRAMES, delay: 120 });
 
 /** Cleanup for the temp clone; module-scoped so cancel()/signals can run it too. */
