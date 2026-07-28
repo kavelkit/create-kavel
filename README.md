@@ -1,6 +1,6 @@
 # create-kavel
 
-[![CI](https://github.com/kavelkit/create-kavel/actions/workflows/ci.yml/badge.svg)](https://github.com/kavelkit/create-kavel/actions/workflows/ci.yml)
+[![CI](https://github.com/kavelkit/create-kavel/actions/workflows/ci.yml/badge.svg)](https://github.com/kavelkit/create-kavel/actions/workflows/ci.yml) [![npm](https://img.shields.io/npm/v/create-kavel)](https://www.npmjs.com/package/create-kavel)
 
 The scaffolding CLI for [Kavel](https://createkavel.com), a full-stack Cloudflare
 starter kit (Bun · TanStack Start · Hono · D1 · Drizzle · oRPC). One command
