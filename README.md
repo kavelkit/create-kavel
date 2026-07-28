@@ -1,5 +1,7 @@
 # create-kavel
 
+[![CI](https://github.com/kavelkit/create-kavel/actions/workflows/ci.yml/badge.svg)](https://github.com/kavelkit/create-kavel/actions/workflows/ci.yml)
+
 The scaffolding CLI for [Kavel](https://createkavel.com), a full-stack Cloudflare
 starter kit (Bun · TanStack Start · Hono · D1 · Drizzle · oRPC). One command
 scaffolds a typed monorepo, wired together and ready to deploy to Cloudflare,
