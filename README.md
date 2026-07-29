@@ -7,6 +7,8 @@ starter kit (Bun · TanStack Start · Hono · D1 · Drizzle · oRPC). One comman
 scaffolds a typed monorepo, wired together and ready to deploy to Cloudflare,
 that you own outright: no subscription, no lock-in.
 
+![Kavel: from one command to a running app](https://raw.githubusercontent.com/kavelkit/create-kavel/main/assets/demo.gif)
+
 ```bash
 bun create kavel
 # or
